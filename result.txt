@@ -1,0 +1,27 @@
+[Hidden layers 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.0033071
+[Hidden layers 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.0020891
+[Hidden layers 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00187819
+[Hidden layers 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00229615
+[Hidden layers 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00174786
+[Hidden layers 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00303322
+[Hidden layers 15 , LR 0.01, Momentum 0.5] AVG MSE: 0.0036231
+[Hidden layers 15 , LR 0.01, Momentum 0.9] AVG MSE: 0.00172787
+[Hidden layers 15 , LR 0.05, Momentum 0.5] AVG MSE: 0.00166443
+[Hidden layers 15 , LR 0.05, Momentum 0.9] AVG MSE: 0.00197456
+[Hidden layers 15 , LR 0.1, Momentum 0.5] AVG MSE: 0.00164062
+[Hidden layers 15 , LR 0.1, Momentum 0.9] AVG MSE: 0.00224388
+[Hidden layers 10 5 , LR 0.01, Momentum 0.5] AVG MSE: 0.00250442
+[Hidden layers 10 5 , LR 0.01, Momentum 0.9] AVG MSE: 0.00177696
+[Hidden layers 10 5 , LR 0.05, Momentum 0.5] AVG MSE: 0.00177434
+[Hidden layers 10 5 , LR 0.05, Momentum 0.9] AVG MSE: 0.00145244
+[Hidden layers 10 5 , LR 0.1, Momentum 0.5] AVG MSE: 0.00179056
+[Hidden layers 10 5 , LR 0.1, Momentum 0.9] AVG MSE: 0.00108394
+[Hidden layers 15 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00320009
+[Hidden layers 15 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00182756
+[Hidden layers 15 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00184547
+[Hidden layers 15 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00120952
+[Hidden layers 15 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00159745
+[Hidden layers 15 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00111906
+
+========= BEST RESULT =========
+Hidden layers: 10 5 , LR: 0.1, Momentum: 0.9, AVG MSE: 0.00108394
