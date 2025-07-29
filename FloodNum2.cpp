@@ -13,6 +13,9 @@ using namespace std;
 // === CONFIG ===
 const int INPUT_SIZE = 8;
 const int OUTPUT_SIZE = 1;
+
+int NUM_HIDDEN_LAYERS = 2; // Number of hidden layers
+vector<int> hidden_sizes = {10, 5}; // Nodes in each hidden layer
 int HIDDEN_SIZE = 10;
 
 double LEARNING_RATE = 0.01;
@@ -131,99 +134,125 @@ void load_dataset(string filename) {
     hidden_size = > hidden node quantity*/
 class MLP {
 public:
-    vector<vector<double>> w_input_hidden, w_hidden_output;
-    vector<vector<double>> delta_input_hidden, delta_hidden_output;
+    vector<vector<vector<double>>> weights;   // weights[layer][from][to]
+    vector<vector<vector<double>>> delta_weights; // momentum term for weights
 
-    vector<double> hidden, output;
-    vector<double> error_output, error_hidden;
+    vector<vector<double>> layers; // activations for each layer (including input and output)
+    vector<vector<double>> errors; // errors for each layer (excluding input layer)
 
-    MLP(int input_size, int hidden_size, int output_size) {
-        init_weights(input_size, hidden_size, output_size);
+    MLP(int input_size, const vector<int>& hidden_sizes, int output_size) {
+        init_network(input_size, hidden_sizes, output_size);
     }
-    //random the first weight
-    void init_weights(int input_size, int hidden_size, int output_size) {
+
+    void init_network(int input_size, const vector<int>& hidden_sizes, int output_size) {
         random_device rd;
         mt19937 gen(rd());
         uniform_real_distribution<> dist(-1, 1);
 
-        w_input_hidden.resize(input_size, vector<double>(hidden_size));
-        delta_input_hidden.resize(input_size, vector<double>(hidden_size));
-        for (auto& row : w_input_hidden)
-            for (auto& w : row) w = dist(gen);
+        int prev_size = input_size;
 
-        w_hidden_output.resize(hidden_size, vector<double>(output_size));
-        delta_hidden_output.resize(hidden_size, vector<double>(output_size));
-        for (auto& row : w_hidden_output)
-            for (auto& w : row) w = dist(gen);
+        int total_layers = hidden_sizes.size() + 1; // hidden layers + output layer
+        weights.resize(total_layers);
+        delta_weights.resize(total_layers);
 
-        hidden.resize(hidden_size);
-        output.resize(output_size);
-        error_output.resize(output_size);
-        error_hidden.resize(hidden_size);
+        // initialize weights between each layer
+        for (int l = 0; l < total_layers; ++l) {
+            int curr_size = (l == total_layers -1) ? output_size : hidden_sizes[l];
+            weights[l].resize(prev_size, vector<double>(curr_size));
+            delta_weights[l].resize(prev_size, vector<double>(curr_size));
+            for (int i = 0; i < prev_size; ++i)
+                for (int j = 0; j < curr_size; ++j)
+                    weights[l][i][j] = dist(gen);
+
+            prev_size = curr_size;
+        }
+
+        // layers activations
+        layers.resize(total_layers + 1); // input + hidden layers + output
+        layers[0].resize(input_size);
+        for (int i = 0; i < hidden_sizes.size(); ++i)
+            layers[i+1].resize(hidden_sizes[i]);
+        layers[total_layers].resize(output_size);
+
+        // errors (no error for input layer)
+        errors.resize(total_layers);
+        for (int i = 0; i < total_layers; ++i) {
+            int sz = (i == total_layers -1) ? output_size : hidden_sizes[i];
+            errors[i].resize(sz);
+        }
     }
-    //calculate output, input => hidden layers => output
+
+    // Forward pass through all layers
     void forward(const vector<double>& input) {
-        for (int j = 0; j < hidden.size(); ++j) {
-            hidden[j] = 0;
-            for (int i = 0; i < input.size(); ++i)
-                hidden[j] += input[i] * w_input_hidden[i][j];
-            hidden[j] = sigmoid(hidden[j]);
-        }
-        for (int k = 0; k < output.size(); ++k) {
-            output[k] = 0;
-            for (int j = 0; j < hidden.size(); ++j)
-                output[k] += hidden[j] * w_hidden_output[j][k];
-            output[k] = sigmoid(output[k]);
-        }
-    }
-    //weight adjustment with backpropagation
-    void backward(const vector<double>& input, const vector<double>& target) {
-        for (int k = 0; k < output.size(); ++k)
-            error_output[k] = (target[k] - output[k]) * sigmoid_derivative(output[k]);
+        layers[0] = input;
 
-        for (int j = 0; j < hidden.size(); ++j) {
-            error_hidden[j] = 0;
-            for (int k = 0; k < output.size(); ++k)
-                error_hidden[j] += error_output[k] * w_hidden_output[j][k];
-            error_hidden[j] *= sigmoid_derivative(hidden[j]);
-        }
-
-        for (int j = 0; j < hidden.size(); ++j) {
-            for (int k = 0; k < output.size(); ++k) {
-                double delta = LEARNING_RATE * error_output[k] * hidden[j] + MOMENTUM * delta_hidden_output[j][k];
-                w_hidden_output[j][k] += delta;
-                delta_hidden_output[j][k] = delta;
-            }
-        }
-
-        for (int i = 0; i < input.size(); ++i) {
-            for (int j = 0; j < hidden.size(); ++j) {
-                double delta = LEARNING_RATE * error_hidden[j] * input[i] + MOMENTUM * delta_input_hidden[i][j];
-                w_input_hidden[i][j] += delta;
-                delta_input_hidden[i][j] = delta;
+        for (int l = 0; l < weights.size(); ++l) {
+            for (int j = 0; j < layers[l+1].size(); ++j) {
+                double sum = 0;
+                for (int i = 0; i < layers[l].size(); ++i)
+                    sum += layers[l][i] * weights[l][i][j];
+                layers[l+1][j] = sigmoid(sum);
             }
         }
     }
-    //find Mean Squared Error from output
+
+    // Backpropagation through all layers
+    void backward(const vector<double>& target) {
+        int last_layer = errors.size() - 1;
+
+        // Calculate output layer error
+        for (int k = 0; k < layers.back().size(); ++k) {
+            errors[last_layer][k] = (target[k] - layers.back()[k]) * sigmoid_derivative(layers.back()[k]);
+        }
+
+        // Calculate hidden layers errors backward
+        for (int l = last_layer - 1; l >= 0; --l) {
+            for (int i = 0; i < errors[l].size(); ++i) {
+                double err_sum = 0;
+                for (int j = 0; j < errors[l+1].size(); ++j)
+                    err_sum += errors[l+1][j] * weights[l+1][i][j];
+                errors[l][i] = err_sum * sigmoid_derivative(layers[l+1][i]);
+            }
+        }
+
+        // Update weights with momentum and learning rate
+        for (int l = 0; l < weights.size(); ++l) {
+            for (int i = 0; i < weights[l].size(); ++i) {
+                for (int j = 0; j < weights[l][i].size(); ++j) {
+                    double delta = LEARNING_RATE * errors[l][j] * layers[l][i] + MOMENTUM * delta_weights[l][i][j];
+                    weights[l][i][j] += delta;
+                    delta_weights[l][i][j] = delta;
+                }
+            }
+        }
+    }
+
+    // Calculate MSE for output
     double mse(const vector<double>& target) {
         double sum = 0;
-        for (int k = 0; k < target.size(); ++k)
-            sum += pow(target[k] - output[k], 2);
+        for (int i = 0; i < target.size(); ++i) {
+            sum += pow(target[i] - layers.back()[i], 2);
+        }
         return sum / target.size();
     }
 };
+
 //10% cross validatiom, k = 10
 // 9 => train with MLP, 1 => test the accuracy
 // k-fold training with varying hyperparameters
 void k_fold_train() {
-    // Define parameters to test
-    vector<int> hidden_sizes = {5, 10, 15};
+    vector<vector<int>> hidden_layer_options = {
+        {10},      // 1 hidden layer with 10 nodes
+        {15},      // 1 hidden layer with 15 nodes
+        {10, 5},   // 2 hidden layers with 10 and 5 nodes
+        {15, 10}   // 2 hidden layers with 15 and 10 nodes
+    };
     vector<double> learning_rates = {0.01, 0.05, 0.1};
     vector<double> momentum_values = {0.5, 0.9};
-    int trial = 1; // number of different random weight initializations
+    int trial = 1;
 
     struct ResultSummary {
-        int hidden;
+        vector<int> hidden_layers;
         double lr;
         double momentum;
         double avg_mse;
@@ -231,17 +260,18 @@ void k_fold_train() {
 
     vector<ResultSummary> all_results;
 
-    for (int hs : hidden_sizes) {
+    for (auto& hidden_layers : hidden_layer_options) {
         for (double lr : learning_rates) {
             for (double mo : momentum_values) {
                 double trial_total_mse = 0;
 
-                for (int t = 1; t <= trial; ++t) {
-                    // Shuffle dataset before splitting
-                    std::random_device rd;
-                    std::mt19937 g(rd());
-                    std::shuffle(dataset.begin(), dataset.end(), g);
-
+                for (int t = 0; t < trial; ++t) {
+                    std::random_device rd; // Creates a random device to generate random seed, different results each time
+                    std::mt19937 g(rd()); // Initializes a pseudo-random number generator (Mersenne Twister)
+                                        //, Uses the non-deterministic seed from 'rd' for better randomness
+                    
+                    std::shuffle(dataset.begin(), dataset.end(), g); // Shuffles the order of all sample
+                                        // Uses the random number generator 'g' to ensure proper, unbiased shuffling
                     int fold_size = dataset.size() / K_FOLD;
                     double avg_mse = 0;
 
@@ -254,53 +284,59 @@ void k_fold_train() {
                                 train_set.push_back(dataset[i]);
                         }
 
-                        // Set global hyperparameters
-                        HIDDEN_SIZE = hs;
+                        // Set global hyperparams for current run
+                        hidden_sizes = hidden_layers;
+                        NUM_HIDDEN_LAYERS = (int)hidden_layers.size();
                         LEARNING_RATE = lr;
                         MOMENTUM = mo;
 
-                        MLP net(INPUT_SIZE, HIDDEN_SIZE, OUTPUT_SIZE);
+                        MLP net(INPUT_SIZE, hidden_sizes, OUTPUT_SIZE);
 
-                        // === This is where EPOCHS is used ===
+                        // Training for EPOCHS times
                         for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-                            for (const auto& s : train_set) {
+                            for (auto& s : train_set) {
                                 net.forward(s.input);
-                                net.backward(s.input, s.output);
+                                net.backward(s.output);
                             }
                         }
 
-                        // Calculate error on test set
+                        // Testing and calculating error
                         double total_error = 0;
-                        for (const auto& s : test_set) {
+                        for (auto& s : test_set) {
                             net.forward(s.input);
                             total_error += net.mse(s.output);
                         }
-
-                        avg_mse += total_error / test_set.size(); // accumulate fold mse
+                        avg_mse += total_error / test_set.size();
                     }
 
                     double final_avg_mse = avg_mse / K_FOLD;
                     trial_total_mse += final_avg_mse;
 
-                    // Show only final AVG MSE per trial
-                    cout << "[Hidden " << hs << ", LR " << lr << ", Momentum " << mo
-                         << "] AVG MSE: " << final_avg_mse << "\n";
+                    cout << "[Hidden layers ";
+                    for (auto n : hidden_layers) cout << n << " ";
+                    cout << ", LR " << lr << ", Momentum " << mo << "] AVG MSE: " << final_avg_mse << "\n";
                 }
 
-                // Store result for final summary
-                all_results.push_back({hs, lr, mo, trial_total_mse / trial});
+                all_results.push_back({hidden_layers, lr, mo, trial_total_mse / trial});
             }
         }
     }
 
-    // === Final Summary ===
-    cout << "\n========= SUMMARY =========\n";
-    for (const auto& r : all_results) {
-        cout << "Hidden: " << r.hidden
-             << ", LR: " << r.lr
-             << ", Momentum: " << r.momentum
-             << ", AVG MSE: " << r.avg_mse << "\n";
-    }
+    // Final summary
+     cout << "\n========= BEST RESULT =========\n";
+
+    // ✅ Find the configuration with the lowest average MSE
+    auto best_result = min_element(all_results.begin(), all_results.end(),
+        [](const ResultSummary& a, const ResultSummary& b) {
+            return a.avg_mse < b.avg_mse;
+        });
+
+    // ✅ Print only the best configuration
+    cout << "Hidden layers: ";
+    for (auto n : best_result->hidden_layers) cout << n << " ";
+    cout << ", LR: " << best_result->lr
+         << ", Momentum: " << best_result->momentum
+         << ", AVG MSE: " << best_result->avg_mse << "\n";
 }
 
 int main() {
