@@ -159,8 +159,9 @@ public:
     }
 
     void init_network(int input_size, const vector<int>& hidden_sizes, int output_size) {
-        random_device rd;
-        mt19937 gen(rd());
+        random_device rd; // Creates a random device to generate random seed, different results each time
+        mt19937 gen(rd()); // Initializes a pseudo-random number generator (Mersenne Twister)
+                         //, Uses the non-deterministic seed from 'rd' for better randomness
 
         int prev_size = input_size;
         int total_layers = hidden_sizes.size() + 1;

@@ -45,8 +45,9 @@ double sigmoid_derivative(double y) {
 }
 
 void shuffle_data(vector<Sample>& data) {
-    random_device rd;
-    mt19937 g(rd());
+    random_device rd; // Creates a random device to generate random seed, different results each time
+    mt19937 g(rd()); // Initializes a pseudo-random number generator (Mersenne Twister)
+                             //, Uses the non-deterministic seed from 'rd' for better randomness
     shuffle(data.begin(), data.end(), g);
 }
 
