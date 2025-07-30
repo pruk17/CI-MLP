@@ -1,32 +1,80 @@
 ======================== การทดลองข้อที่ 1 ===========================
 
-[Hidden layers 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.0033071
-[Hidden layers 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.0020891
-[Hidden layers 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00187819
-[Hidden layers 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00229615
-[Hidden layers 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00174786
-[Hidden layers 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00303322
-[Hidden layers 15 , LR 0.01, Momentum 0.5] AVG MSE: 0.0036231
-[Hidden layers 15 , LR 0.01, Momentum 0.9] AVG MSE: 0.00172787
-[Hidden layers 15 , LR 0.05, Momentum 0.5] AVG MSE: 0.00166443
-[Hidden layers 15 , LR 0.05, Momentum 0.9] AVG MSE: 0.00197456
-[Hidden layers 15 , LR 0.1, Momentum 0.5] AVG MSE: 0.00164062
-[Hidden layers 15 , LR 0.1, Momentum 0.9] AVG MSE: 0.00224388
-[Hidden layers 10 5 , LR 0.01, Momentum 0.5] AVG MSE: 0.00250442
-[Hidden layers 10 5 , LR 0.01, Momentum 0.9] AVG MSE: 0.00177696
-[Hidden layers 10 5 , LR 0.05, Momentum 0.5] AVG MSE: 0.00177434
-[Hidden layers 10 5 , LR 0.05, Momentum 0.9] AVG MSE: 0.00145244
-[Hidden layers 10 5 , LR 0.1, Momentum 0.5] AVG MSE: 0.00179056
-[Hidden layers 10 5 , LR 0.1, Momentum 0.9] AVG MSE: 0.00108394
-[Hidden layers 15 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00320009
-[Hidden layers 15 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00182756
-[Hidden layers 15 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00184547
-[Hidden layers 15 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00120952
-[Hidden layers 15 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00159745
-[Hidden layers 15 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00111906
+[Weight: basic init] [Hidden layers 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00372769
+[Weight: basic init] [Hidden layers 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00210669
+[Weight: basic init] [Hidden layers 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00189618
+[Weight: basic init] [Hidden layers 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00231373
+[Weight: basic init] [Hidden layers 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00188617
+[Weight: basic init] [Hidden layers 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00321482
+[Weight: basic init] [Hidden layers 15 , LR 0.01, Momentum 0.5] AVG MSE: 0.0037304
+[Weight: basic init] [Hidden layers 15 , LR 0.01, Momentum 0.9] AVG MSE: 0.00190519
+[Weight: basic init] [Hidden layers 15 , LR 0.05, Momentum 0.5] AVG MSE: 0.00183325
+[Weight: basic init] [Hidden layers 15 , LR 0.05, Momentum 0.9] AVG MSE: 0.00208362
+[Weight: basic init] [Hidden layers 15 , LR 0.1, Momentum 0.5] AVG MSE: 0.00181853
+[Weight: basic init] [Hidden layers 15 , LR 0.1, Momentum 0.9] AVG MSE: 0.00242441
+[Weight: basic init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] AVG MSE: 0.00458743
+[Weight: basic init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] AVG MSE: 0.00182797
+[Weight: basic init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] AVG MSE: 0.00180956
+[Weight: basic init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] AVG MSE: 0.00137717
+[Weight: basic init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] AVG MSE: 0.00179571
+[Weight: basic init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] AVG MSE: 0.00135096
+[Weight: basic init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00365941
+[Weight: basic init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00178821
+[Weight: basic init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.0018162
+[Weight: basic init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00143229
+[Weight: basic init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00180749
+[Weight: basic init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00119867
+[Weight: xavier init] [Hidden layers 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00341131
+[Weight: xavier init] [Hidden layers 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00196906
+[Weight: xavier init] [Hidden layers 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00197625
+[Weight: xavier init] [Hidden layers 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00206194
+[Weight: xavier init] [Hidden layers 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00196111
+[Weight: xavier init] [Hidden layers 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00382285
+[Weight: xavier init] [Hidden layers 15 , LR 0.01, Momentum 0.5] AVG MSE: 0.00368875
+[Weight: xavier init] [Hidden layers 15 , LR 0.01, Momentum 0.9] AVG MSE: 0.00185646
+[Weight: xavier init] [Hidden layers 15 , LR 0.05, Momentum 0.5] AVG MSE: 0.00190927
+[Weight: xavier init] [Hidden layers 15 , LR 0.05, Momentum 0.9] AVG MSE: 0.0020799
+[Weight: xavier init] [Hidden layers 15 , LR 0.1, Momentum 0.5] AVG MSE: 0.0018897
+[Weight: xavier init] [Hidden layers 15 , LR 0.1, Momentum 0.9] AVG MSE: 0.00197374
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] AVG MSE: 0.00263963
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] AVG MSE: 0.00201769
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] AVG MSE: 0.00184047
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] AVG MSE: 0.00207084
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] AVG MSE: 0.0017595
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] AVG MSE: 0.00122842
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00306532
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00180535
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00198016
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00122944
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00171385
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00117417
+[Weight: he init] [Hidden layers 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00350095
+[Weight: he init] [Hidden layers 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00201605
+[Weight: he init] [Hidden layers 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00191064
+[Weight: he init] [Hidden layers 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00191543
+[Weight: he init] [Hidden layers 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00186634
+[Weight: he init] [Hidden layers 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00241337
+[Weight: he init] [Hidden layers 15 , LR 0.01, Momentum 0.5] AVG MSE: 0.00349541
+[Weight: he init] [Hidden layers 15 , LR 0.01, Momentum 0.9] AVG MSE: 0.00188595
+[Weight: he init] [Hidden layers 15 , LR 0.05, Momentum 0.5] AVG MSE: 0.00188668
+[Weight: he init] [Hidden layers 15 , LR 0.05, Momentum 0.9] AVG MSE: 0.00237386
+[Weight: he init] [Hidden layers 15 , LR 0.1, Momentum 0.5] AVG MSE: 0.00182811
+[Weight: he init] [Hidden layers 15 , LR 0.1, Momentum 0.9] AVG MSE: 0.00190161
+[Weight: he init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] AVG MSE: 0.00274377
+[Weight: he init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] AVG MSE: 0.00188122
+[Weight: he init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] AVG MSE: 0.00176184
+[Weight: he init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] AVG MSE: 0.00174402
+[Weight: he init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] AVG MSE: 0.00164585
+[Weight: he init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] AVG MSE: 0.00105774
+[Weight: he init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] AVG MSE: 0.00253414
+[Weight: he init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] AVG MSE: 0.00193721
+[Weight: he init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] AVG MSE: 0.00221471
+[Weight: he init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] AVG MSE: 0.00140879
+[Weight: he init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] AVG MSE: 0.00170602
+[Weight: he init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] AVG MSE: 0.00129743
 
 ========= BEST RESULT =========
-Hidden layers: 10 5 , LR: 0.1, Momentum: 0.9, AVG MSE: 0.00108394
+[Weight: he init] Hidden layers: 10 5 , LR: 0.1, Momentum: 0.9, AVG MSE: 0.00105774| RMSE: 0.0325229
 
 ======================== การทดลองข้อที่ 2 ===========================
 

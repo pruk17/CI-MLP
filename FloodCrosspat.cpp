@@ -1,10 +1,10 @@
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <cmath>
-#include <algorithm>
-#include <random>
+#include <iostream> // input / output
+#include <vector>   // vector array 
+#include <fstream>  // read file
+#include <sstream>  // string -> number
+#include <cmath>    // exp(), pow(), etc.
+//#include <algorithm>
+#include <random> 
 using namespace std;
 
 enum InitType { BASIC, XAVIER, HE };

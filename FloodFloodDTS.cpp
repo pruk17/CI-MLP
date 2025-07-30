@@ -23,6 +23,18 @@ double MOMENTUM = 0.9;
 int EPOCHS = 1000;
 int K_FOLD = 10;
 
+enum InitType { BASIC, XAVIER, HE };
+
+string get_init_name(InitType init) {
+    switch (init) {
+        case BASIC: return "basic ";
+        case XAVIER: return "xavier ";
+        case HE: return "he ";
+    }
+    return "unknown";
+}
+
+
 struct Sample {
     vector<double> input;
     vector<double> output;
@@ -134,53 +146,71 @@ void load_dataset(string filename) {
     hidden_size = > hidden node quantity*/
 class MLP {
 public:
+    InitType init_type;
     vector<vector<vector<double>>> weights;   // weights[layer][from][to]
     vector<vector<vector<double>>> delta_weights; // momentum term for weights
 
     vector<vector<double>> layers; // activations for each layer (including input and output)
     vector<vector<double>> errors; // errors for each layer (excluding input layer)
 
-    MLP(int input_size, const vector<int>& hidden_sizes, int output_size) {
+    MLP(int input_size, const vector<int>& hidden_sizes, int output_size, InitType init_type = BASIC)
+        : init_type(init_type) {
         init_network(input_size, hidden_sizes, output_size);
     }
 
     void init_network(int input_size, const vector<int>& hidden_sizes, int output_size) {
         random_device rd;
         mt19937 gen(rd());
-        uniform_real_distribution<> dist(-1, 1);
 
         int prev_size = input_size;
-
-        int total_layers = hidden_sizes.size() + 1; // hidden layers + output layer
+        int total_layers = hidden_sizes.size() + 1;
         weights.resize(total_layers);
         delta_weights.resize(total_layers);
 
-        // initialize weights between each layer
         for (int l = 0; l < total_layers; ++l) {
-            int curr_size = (l == total_layers -1) ? output_size : hidden_sizes[l];
+            int curr_size = (l == total_layers - 1) ? output_size : hidden_sizes[l];
             weights[l].resize(prev_size, vector<double>(curr_size));
             delta_weights[l].resize(prev_size, vector<double>(curr_size));
-            for (int i = 0; i < prev_size; ++i)
-                for (int j = 0; j < curr_size; ++j)
-                    weights[l][i][j] = dist(gen);
+
+            for (int i = 0; i < prev_size; ++i) {
+                for (int j = 0; j < curr_size; ++j) {
+                    double weight = 0;
+                    switch (init_type) {
+                        case BASIC:
+                            weight = ((double)rand() / RAND_MAX) * 0.2 - 0.1; // -0.1 to 0.1
+                            break;
+                        case XAVIER: {
+                            double limit = sqrt(6.0 / (prev_size + curr_size));
+                            uniform_real_distribution<> dist(-limit, limit);
+                            weight = dist(gen);
+                            break;
+                        }
+                        case HE: {
+                            normal_distribution<> dist(0.0, sqrt(2.0 / prev_size));
+                            weight = dist(gen);
+                            break;
+                        }
+                    }
+                    weights[l][i][j] = weight;
+                }
+            }
 
             prev_size = curr_size;
         }
 
-        // layers activations
-        layers.resize(total_layers + 1); // input + hidden layers + output
+        layers.resize(total_layers + 1);
         layers[0].resize(input_size);
         for (int i = 0; i < hidden_sizes.size(); ++i)
-            layers[i+1].resize(hidden_sizes[i]);
+            layers[i + 1].resize(hidden_sizes[i]);
         layers[total_layers].resize(output_size);
 
-        // errors (no error for input layer)
         errors.resize(total_layers);
         for (int i = 0; i < total_layers; ++i) {
-            int sz = (i == total_layers -1) ? output_size : hidden_sizes[i];
+            int sz = (i == total_layers - 1) ? output_size : hidden_sizes[i];
             errors[i].resize(sz);
         }
     }
+
 
     // Forward pass through all layers
     void forward(const vector<double>& input) {
@@ -242,10 +272,7 @@ public:
 // k-fold training with varying hyperparameters
 void k_fold_train() {
     vector<vector<int>> hidden_layer_options = {
-        {10},      // 1 hidden layer with 10 nodes
-        {15},      // 1 hidden layer with 15 nodes
-        {10, 5},   // 2 hidden layers with 10 and 5 nodes
-        {15, 10}   // 2 hidden layers with 15 and 10 nodes
+        {10}, {15}, {10, 5}, {15, 10}
     };
     vector<double> learning_rates = {0.01, 0.05, 0.1};
     vector<double> momentum_values = {0.5, 0.9};
@@ -256,89 +283,87 @@ void k_fold_train() {
         double lr;
         double momentum;
         double avg_mse;
+        InitType init_type;
     };
 
     vector<ResultSummary> all_results;
 
-    for (auto& hidden_layers : hidden_layer_options) {
-        for (double lr : learning_rates) {
-            for (double mo : momentum_values) {
-                double trial_total_mse = 0;
+    for (int init = 0; init <= 2; ++init) {
+        InitType init_type = static_cast<InitType>(init);
 
-                for (int t = 0; t < trial; ++t) {
-                    std::random_device rd; // Creates a random device to generate random seed, different results each time
-                    std::mt19937 g(rd()); // Initializes a pseudo-random number generator (Mersenne Twister)
-                                        //, Uses the non-deterministic seed from 'rd' for better randomness
-                    
-                    std::shuffle(dataset.begin(), dataset.end(), g); // Shuffles the order of all sample
-                                        // Uses the random number generator 'g' to ensure proper, unbiased shuffling
-                    int fold_size = dataset.size() / K_FOLD;
-                    double avg_mse = 0;
+        for (auto& hidden_layers : hidden_layer_options) {
+            for (double lr : learning_rates) {
+                for (double mo : momentum_values) {
+                    double trial_total_mse = 0;
 
-                    for (int fold = 0; fold < K_FOLD; ++fold) {
-                        vector<Sample> train_set, test_set;
-                        for (int i = 0; i < dataset.size(); ++i) {
-                            if (i >= fold * fold_size && i < (fold + 1) * fold_size)
-                                test_set.push_back(dataset[i]);
-                            else
-                                train_set.push_back(dataset[i]);
-                        }
+                    for (int t = 0; t < trial; ++t) {
+                        mt19937 g(random_device{}());
+                        shuffle(dataset.begin(), dataset.end(), g);
 
-                        // Set global hyperparams for current run
-                        hidden_sizes = hidden_layers;
-                        NUM_HIDDEN_LAYERS = (int)hidden_layers.size();
-                        LEARNING_RATE = lr;
-                        MOMENTUM = mo;
+                        int fold_size = dataset.size() / K_FOLD;
+                        double avg_mse = 0;
 
-                        MLP net(INPUT_SIZE, hidden_sizes, OUTPUT_SIZE);
-
-                        // Training for EPOCHS times
-                        for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-                            for (auto& s : train_set) {
-                                net.forward(s.input);
-                                net.backward(s.output);
+                        for (int fold = 0; fold < K_FOLD; ++fold) {
+                            vector<Sample> train_set, test_set;
+                            for (int i = 0; i < dataset.size(); ++i) {
+                                if (i >= fold * fold_size && i < (fold + 1) * fold_size)
+                                    test_set.push_back(dataset[i]);
+                                else
+                                    train_set.push_back(dataset[i]);
                             }
+
+                            hidden_sizes = hidden_layers;
+                            NUM_HIDDEN_LAYERS = (int)hidden_layers.size();
+                            LEARNING_RATE = lr;
+                            MOMENTUM = mo;
+
+                            MLP net(INPUT_SIZE, hidden_sizes, OUTPUT_SIZE, init_type);
+
+                            for (int epoch = 0; epoch < EPOCHS; ++epoch) {
+                                for (auto& s : train_set) {
+                                    net.forward(s.input);
+                                    net.backward(s.output);
+                                }
+                            }
+
+                            double total_error = 0;
+                            for (auto& s : test_set) {
+                                net.forward(s.input);
+                                total_error += net.mse(s.output);
+                            }
+                            avg_mse += total_error / test_set.size();
                         }
 
-                        // Testing and calculating error
-                        double total_error = 0;
-                        for (auto& s : test_set) {
-                            net.forward(s.input);
-                            total_error += net.mse(s.output);
-                        }
-                        avg_mse += total_error / test_set.size();
+                        double final_avg_mse = avg_mse / K_FOLD;
+                        trial_total_mse += final_avg_mse;
+
+                        cout << "[Weight: " << get_init_name(init_type)
+                             << "init] [Hidden layers ";
+                        for (auto n : hidden_layers) cout << n << " ";
+                        cout << ", LR " << lr << ", Momentum " << mo << "] AVG MSE: "
+                             << final_avg_mse << "\n";
                     }
 
-                    double final_avg_mse = avg_mse / K_FOLD;
-                    trial_total_mse += final_avg_mse;
-
-                    cout << "[Hidden layers ";
-                    for (auto n : hidden_layers) cout << n << " ";
-                    cout << ", LR " << lr << ", Momentum " << mo << "] AVG MSE: " << final_avg_mse << "\n";
+                    all_results.push_back({hidden_layers, lr, mo, trial_total_mse / trial, init_type});
                 }
-
-                all_results.push_back({hidden_layers, lr, mo, trial_total_mse / trial});
             }
         }
     }
 
-    // Final summary
-     cout << "\n========= BEST RESULT =========\n";
-     cout << "Train with: Cross.pat => Cross.csv\n";
+    cout << "\n========= BEST RESULT =========\n";
 
-    // ✅ Find the configuration with the lowest average MSE
     auto best_result = min_element(all_results.begin(), all_results.end(),
         [](const ResultSummary& a, const ResultSummary& b) {
             return a.avg_mse < b.avg_mse;
         });
-
-    // ✅ Print only the best configuration
-    cout << "Hidden layers: ";
+        double rmse = sqrt(best_result->avg_mse);
+    cout << "[Weight: " << get_init_name(best_result->init_type) << "init] Hidden layers: ";
     for (auto n : best_result->hidden_layers) cout << n << " ";
     cout << ", LR: " << best_result->lr
          << ", Momentum: " << best_result->momentum
-         << ", AVG MSE: " << best_result->avg_mse << "\n";
+         << ", AVG MSE: " << best_result->avg_mse << "| RMSE: " << rmse << "\n";
 }
+
 
 int main() {
     load_dataset("Flood_dataset.csv"); //.txt => .csv for better use in tables
