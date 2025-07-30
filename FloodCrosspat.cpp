@@ -3,8 +3,8 @@
 #include <fstream>  // read file
 #include <sstream>  // string -> number
 #include <cmath>    // exp(), pow(), etc.
-//#include <algorithm>
-#include <random> 
+#include <algorithm> // for using shuffle
+#include <random>  // for using mt19937
 using namespace std;
 
 enum InitType { BASIC, XAVIER, HE };

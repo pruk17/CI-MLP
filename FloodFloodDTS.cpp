@@ -17,11 +17,11 @@ const int OUTPUT_SIZE = 1;
 int NUM_HIDDEN_LAYERS = 2; // Number of hidden layers
 vector<int> hidden_sizes = {10, 5}; // Nodes in each hidden layer
 int HIDDEN_SIZE = 10;
-
+//start-up values
 double LEARNING_RATE = 0.01;
 double MOMENTUM = 0.9;
-int EPOCHS = 1000;
-int K_FOLD = 10;
+int EPOCHS = 1000; //test in 1000 loop
+int K_FOLD = 10; //for 10% cross validation
 
 enum InitType { BASIC, XAVIER, HE };
 
