@@ -30,17 +30,94 @@ Hidden layers: 10 5 , LR: 0.1, Momentum: 0.9, AVG MSE: 0.00108394
 
 ======================== การทดลองข้อที่ 2 ===========================
 
-[Trial 11] Hidden: 15 , LR: 0.1, Momentum: 0.5, Accuracy: 91%
-[Trial 12] Hidden: 15 , LR: 0.1, Momentum: 0.9, Accuracy: 90%
-[Trial 13] Hidden: 10 5 , LR: 0.01, Momentum: 0.5, Accuracy: 44%
-[Trial 14] Hidden: 10 5 , LR: 0.01, Momentum: 0.9, Accuracy: 43.5%
-[Trial 15] Hidden: 10 5 , LR: 0.05, Momentum: 0.5, Accuracy: 43%
-[Trial 16] Hidden: 10 5 , LR: 0.05, Momentum: 0.9, Accuracy: 49%
-[Trial 17] Hidden: 10 5 , LR: 0.1, Momentum: 0.5, Accuracy: 52%
-[Trial 18] Hidden: 10 5 , LR: 0.1, Momentum: 0.9, Accuracy: 59%
-[Trial 19] Hidden: 15 10 , LR: 0.01, Momentum: 0.5, Accuracy: 48%
-[Trial 20] Hidden: 15 10 , LR: 0.01, Momentum: 0.9, Accuracy: 40%
-[Trial 21] Hidden: 15 10 , LR: 0.05, Momentum: 0.5, Accuracy: 45%
-[Trial 22] Hidden: 15 10 , LR: 0.05, Momentum: 0.9, Accuracy: 61%
-[Trial 23] Hidden: 15 10 , LR: 0.1, Momentum: 0.5, Accuracy: 53.5%
-[Trial 24] Hidden: 15 10 , LR: 0.1, Momentum: 0.9, Accuracy: 59%
+=== Training with MSE Threshold = 0.02 ===
+[Weight: basic init] [Hidden layers 10 , LR 0.01, Momentum 0.5] Accuracy: 43.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 , LR 0.01, Momentum 0.9] Accuracy: 87.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 , LR 0.05, Momentum 0.5] Accuracy: 83.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 , LR 0.05, Momentum 0.9] Accuracy: 97.5%, Epochs to converge: 538
+[Weight: basic init] [Hidden layers 10 , LR 0.1, Momentum 0.5] Accuracy: 95.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 , LR 0.1, Momentum 0.9] Accuracy: 95.5%, Epochs to converge: 552
+[Weight: basic init] [Hidden layers 15 , LR 0.01, Momentum 0.5] Accuracy: 48%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 , LR 0.01, Momentum 0.9] Accuracy: 82%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 , LR 0.05, Momentum 0.5] Accuracy: 85.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 , LR 0.05, Momentum 0.9] Accuracy: 95.5%, Epochs to converge: 779
+[Weight: basic init] [Hidden layers 15 , LR 0.1, Momentum 0.5] Accuracy: 95%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 , LR 0.1, Momentum 0.9] Accuracy: 97%, Epochs to converge: 501
+[Weight: basic init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] Accuracy: 44%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] Accuracy: 41.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] Accuracy: 41%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] Accuracy: 58%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] Accuracy: 51.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] Accuracy: 58.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] Accuracy: 43%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] Accuracy: 41%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] Accuracy: 43.5%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] Accuracy: 65%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] Accuracy: 47%, Epochs to converge: 1000
+[Weight: basic init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] Accuracy: 59%, Epochs to converge: 1000
+======= Confusion Matrix for basic init =======
+| TruePositive : 1554  | FalseNegative : 846 |
+| FalsePositive: 756  | TrueNegative : 1644 |
+
+[Weight: xavier init] [Hidden layers 10 , LR 0.01, Momentum 0.5] Accuracy: 45%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 , LR 0.01, Momentum 0.9] Accuracy: 90.5%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 , LR 0.05, Momentum 0.5] Accuracy: 90%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 , LR 0.05, Momentum 0.9] Accuracy: 96.5%, Epochs to converge: 469
+[Weight: xavier init] [Hidden layers 10 , LR 0.1, Momentum 0.5] Accuracy: 97%, Epochs to converge: 957
+[Weight: xavier init] [Hidden layers 10 , LR 0.1, Momentum 0.9] Accuracy: 96%, Epochs to converge: 657
+[Weight: xavier init] [Hidden layers 15 , LR 0.01, Momentum 0.5] Accuracy: 52%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 , LR 0.01, Momentum 0.9] Accuracy: 93%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 , LR 0.05, Momentum 0.5] Accuracy: 91.5%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 , LR 0.05, Momentum 0.9] Accuracy: 96%, Epochs to converge: 807
+[Weight: xavier init] [Hidden layers 15 , LR 0.1, Momentum 0.5] Accuracy: 95.5%, Epochs to converge: 964
+[Weight: xavier init] [Hidden layers 15 , LR 0.1, Momentum 0.9] Accuracy: 95%, Epochs to converge: 837
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] Accuracy: 46%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] Accuracy: 83%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] Accuracy: 75%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] Accuracy: 91.5%, Epochs to converge: 882
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] Accuracy: 79%, Epochs to converge: 987
+[Weight: xavier init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] Accuracy: 93%, Epochs to converge: 915
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] Accuracy: 44.5%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] Accuracy: 78.5%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] Accuracy: 72%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] Accuracy: 93.5%, Epochs to converge: 925
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] Accuracy: 83%, Epochs to converge: 1000
+[Weight: xavier init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] Accuracy: 94.5%, Epochs to converge: 663
+======= Confusion Matrix for xavier init =======
+| TruePositive : 2039  | FalseNegative : 361 |
+| FalsePositive: 496  | TrueNegative : 1904 |
+
+[Weight: he init] [Hidden layers 10 , LR 0.01, Momentum 0.5] Accuracy: 73.5%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 , LR 0.01, Momentum 0.9] Accuracy: 97%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 , LR 0.05, Momentum 0.5] Accuracy: 96.5%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 , LR 0.05, Momentum 0.9] Accuracy: 97.5%, Epochs to converge: 486
+[Weight: he init] [Hidden layers 10 , LR 0.1, Momentum 0.5] Accuracy: 97%, Epochs to converge: 821
+[Weight: he init] [Hidden layers 10 , LR 0.1, Momentum 0.9] Accuracy: 95.5%, Epochs to converge: 302
+[Weight: he init] [Hidden layers 15 , LR 0.01, Momentum 0.5] Accuracy: 76.5%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 15 , LR 0.01, Momentum 0.9] Accuracy: 93%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 15 , LR 0.05, Momentum 0.5] Accuracy: 93%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 15 , LR 0.05, Momentum 0.9] Accuracy: 96%, Epochs to converge: 510
+[Weight: he init] [Hidden layers 15 , LR 0.1, Momentum 0.5] Accuracy: 98%, Epochs to converge: 902
+[Weight: he init] [Hidden layers 15 , LR 0.1, Momentum 0.9] Accuracy: 96.5%, Epochs to converge: 507
+[Weight: he init] [Hidden layers 10 5 , LR 0.01, Momentum 0.5] Accuracy: 54.5%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 5 , LR 0.01, Momentum 0.9] Accuracy: 95%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 5 , LR 0.05, Momentum 0.5] Accuracy: 96%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 10 5 , LR 0.05, Momentum 0.9] Accuracy: 93.5%, Epochs to converge: 609
+[Weight: he init] [Hidden layers 10 5 , LR 0.1, Momentum 0.5] Accuracy: 95.5%, Epochs to converge: 775
+[Weight: he init] [Hidden layers 10 5 , LR 0.1, Momentum 0.9] Accuracy: 93.5%, Epochs to converge: 496
+[Weight: he init] [Hidden layers 15 10 , LR 0.01, Momentum 0.5] Accuracy: 59.5%, Epochs to converge: 1000
+[Weight: he init] [Hidden layers 15 10 , LR 0.01, Momentum 0.9] Accuracy: 96.5%, Epochs to converge: 999
+[Weight: he init] [Hidden layers 15 10 , LR 0.05, Momentum 0.5] Accuracy: 97%, Epochs to converge: 997
+[Weight: he init] [Hidden layers 15 10 , LR 0.05, Momentum 0.9] Accuracy: 95.5%, Epochs to converge: 429
+[Weight: he init] [Hidden layers 15 10 , LR 0.1, Momentum 0.5] Accuracy: 95.5%, Epochs to converge: 699
+[Weight: he init] [Hidden layers 15 10 , LR 0.1, Momentum 0.9] Accuracy: 97%, Epochs to converge: 265
+======= Confusion Matrix for he init =======
+| TruePositive : 2160  | FalseNegative : 240 |
+| FalsePositive: 202  | TrueNegative : 2198 |
+
+========= BEST RESULT =========
+Train with: Cross.pat => Cross.csv
+[he init] [Hidden layers 15 , LR 0.1, Momentum 0.5] Accuracy: 98%, Epochs to converge: 902
+======= Confusion Matrix (Best) =======
+| TruePositive : 100  | FalseNegative : 0 |
+| FalsePositive: 4  | TrueNegative : 96 |
