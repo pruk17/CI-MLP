@@ -324,6 +324,7 @@ void k_fold_train() {
 
     // Final summary
      cout << "\n========= BEST RESULT =========\n";
+     cout << "Train with: Cross.pat => Cross.csv\n";
 
     // ✅ Find the configuration with the lowest average MSE
     auto best_result = min_element(all_results.begin(), all_results.end(),

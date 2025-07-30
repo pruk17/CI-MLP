@@ -30,13 +30,17 @@ Hidden layers: 10 5 , LR: 0.1, Momentum: 0.9, AVG MSE: 0.00108394
 
 ======================== การทดลองข้อที่ 2 ===========================
 
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 100 AVG MSE: 0.4992683
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 200 AVG MSE: 0.4986817
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 300 AVG MSE: 0.4979571
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 400 AVG MSE: 0.4969372
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 500 AVG MSE: 0.4953689
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 600 AVG MSE: 0.4929283
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 700 AVG MSE: 0.4893106
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 800 AVG MSE: 0.4838990
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 900 AVG MSE: 0.4747591
-[Hidden layers 5 , LR 0.0100000, Momentum 0.5000000] Epoch 1000 AVG MSE: 0.4569781
+[Trial 11] Hidden: 15 , LR: 0.1, Momentum: 0.5, Accuracy: 91%
+[Trial 12] Hidden: 15 , LR: 0.1, Momentum: 0.9, Accuracy: 90%
+[Trial 13] Hidden: 10 5 , LR: 0.01, Momentum: 0.5, Accuracy: 44%
+[Trial 14] Hidden: 10 5 , LR: 0.01, Momentum: 0.9, Accuracy: 43.5%
+[Trial 15] Hidden: 10 5 , LR: 0.05, Momentum: 0.5, Accuracy: 43%
+[Trial 16] Hidden: 10 5 , LR: 0.05, Momentum: 0.9, Accuracy: 49%
+[Trial 17] Hidden: 10 5 , LR: 0.1, Momentum: 0.5, Accuracy: 52%
+[Trial 18] Hidden: 10 5 , LR: 0.1, Momentum: 0.9, Accuracy: 59%
+[Trial 19] Hidden: 15 10 , LR: 0.01, Momentum: 0.5, Accuracy: 48%
+[Trial 20] Hidden: 15 10 , LR: 0.01, Momentum: 0.9, Accuracy: 40%
+[Trial 21] Hidden: 15 10 , LR: 0.05, Momentum: 0.5, Accuracy: 45%
+[Trial 22] Hidden: 15 10 , LR: 0.05, Momentum: 0.9, Accuracy: 61%
+[Trial 23] Hidden: 15 10 , LR: 0.1, Momentum: 0.5, Accuracy: 53.5%
+[Trial 24] Hidden: 15 10 , LR: 0.1, Momentum: 0.9, Accuracy: 59%

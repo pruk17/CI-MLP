@@ -2,249 +2,241 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <string>
 #include <cmath>
+#include <algorithm>
 #include <random>
-#include <iomanip>
-
 using namespace std;
 
-// Activation function (sigmoid) และอนุพันธ์
+// === CONFIG ===
+const int INPUT_SIZE = 2;
+const int OUTPUT_SIZE = 1;
+
+int EPOCHS = 1000;
+int K_FOLD = 10;
+
+vector<vector<int>> hidden_layer_options = {
+    {10},      // 1 hidden layer with 10 nodes
+    {15},      // 1 hidden layer with 15 nodes
+    {10, 5},   // 2 hidden layers with 10 and 5 nodes
+    {15, 10}   // 2 hidden layers with 15 and 10 nodes
+};
+vector<double> learning_rates = {0.01, 0.05, 0.1};
+vector<double> momentum_values = {0.5, 0.9};
+
+struct Sample {
+    vector<double> input;
+    vector<double> target;
+};
+
 double sigmoid(double x) {
     return 1.0 / (1.0 + exp(-x));
 }
+
 double sigmoid_derivative(double y) {
-    return y * (1.0 - y);  // y = sigmoid(x)
+    return y * (1.0 - y);
 }
 
-// โหลด dataset จากไฟล์
-void load_dataset(const string& filename, vector<vector<double>>& inputs, vector<vector<double>>& outputs) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error opening file: " << filename << endl;
-        exit(1);
-    }
-
-    string line;
-    while (getline(file, line)) {
-        string label = line;
-        if (label.empty()) continue;
-
-        // อ่าน input
-        if (!getline(file, line)) {
-            cerr << "Unexpected EOF after label " << label << endl;
-            exit(1);
-        }
-        istringstream ss_input(line);
-        vector<double> input_values;
-        string token;
-        while (getline(ss_input, token, ',')) {
-            try {
-                input_values.push_back(stod(token));
-            } catch (...) {
-                cerr << "Invalid input value after label " << label << endl;
-                exit(1);
-            }
-        }
-        if (input_values.size() != 2) {
-            cerr << "Input size != 2 after label " << label << endl;
-            exit(1);
-        }
-
-        // อ่าน output
-        if (!getline(file, line)) {
-            cerr << "Unexpected EOF after input for label " << label << endl;
-            exit(1);
-        }
-        istringstream ss_output(line);
-        vector<double> output_values;
-        while (getline(ss_output, token, ',')) {
-            try {
-                output_values.push_back(stod(token));
-            } catch (...) {
-                cerr << "Invalid output value after label " << label << endl;
-                exit(1);
-            }
-        }
-        if (output_values.size() != 2) {
-            cerr << "Output size != 2 after label " << label << endl;
-            exit(1);
-        }
-
-        inputs.push_back(input_values);
-        outputs.push_back(output_values);
-    }
-
-    file.close();
+void shuffle_data(vector<Sample>& data) {
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(data.begin(), data.end(), g);
 }
 
-// MLP Class
 class MLP {
 public:
-    int input_size;
-    int hidden_size;
-    int output_size;
-    double learning_rate;
-    double momentum;
+    vector<int> layers;
+    vector<vector<vector<double>>> weights;
+    vector<vector<vector<double>>> prev_deltas;
+    vector<vector<double>> neurons;
+    vector<vector<double>> deltas;
+    double LEARNING_RATE;
+    double MOMENTUM;
 
-    vector<vector<double>> w_input_hidden;   // weights input->hidden
-    vector<double> bias_hidden;
-    vector<vector<double>> w_hidden_output;  // weights hidden->output
-    vector<double> bias_output;
-
-    vector<double> hidden_layer_output;
-    vector<double> output_layer_output;
-
-    vector<vector<double>> delta_w_input_hidden;  // สำหรับ momentum
-    vector<double> delta_bias_hidden;
-    vector<vector<double>> delta_w_hidden_output;
-    vector<double> delta_bias_output;
-
-    MLP(int input_size, int hidden_size, int output_size,
-        double learning_rate = 0.01, double momentum = 0.5)
-        : input_size(input_size), hidden_size(hidden_size), output_size(output_size),
-          learning_rate(learning_rate), momentum(momentum) {
-        init_weights();
+    MLP(vector<int> layer_config, double lr, double mmt) : layers(layer_config), LEARNING_RATE(lr), MOMENTUM(mmt) {
+        init_network();
     }
 
-    void init_weights() {
-        random_device rd;
-        mt19937 gen(rd());
-        uniform_real_distribution<> dis(-1.0, 1.0);
+    void init_network() {
+        neurons.resize(layers.size());
+        deltas.resize(layers.size());
+        weights.resize(layers.size() - 1);
+        prev_deltas.resize(layers.size() - 1);
 
-        w_input_hidden.resize(hidden_size, vector<double>(input_size));
-        bias_hidden.resize(hidden_size);
-        w_hidden_output.resize(output_size, vector<double>(hidden_size));
-        bias_output.resize(output_size);
-
-        delta_w_input_hidden.resize(hidden_size, vector<double>(input_size, 0.0));
-        delta_bias_hidden.resize(hidden_size, 0.0);
-        delta_w_hidden_output.resize(output_size, vector<double>(hidden_size, 0.0));
-        delta_bias_output.resize(output_size, 0.0);
-
-        for (int i = 0; i < hidden_size; ++i) {
-            for (int j = 0; j < input_size; ++j) {
-                w_input_hidden[i][j] = dis(gen);
-            }
-            bias_hidden[i] = dis(gen);
+        for (size_t i = 0; i < layers.size(); ++i) {
+            neurons[i].resize(layers[i], 0.0);
+            deltas[i].resize(layers[i], 0.0);
         }
 
-        for (int i = 0; i < output_size; ++i) {
-            for (int j = 0; j < hidden_size; ++j) {
-                w_hidden_output[i][j] = dis(gen);
+        for (size_t i = 0; i < weights.size(); ++i) {
+            weights[i].resize(layers[i + 1]);
+            prev_deltas[i].resize(layers[i + 1]);
+            for (int j = 0; j < layers[i + 1]; ++j) {
+                weights[i][j].resize(layers[i] + 1);
+                prev_deltas[i][j].resize(layers[i] + 1);
+                for (int k = 0; k <= layers[i]; ++k) {
+                    weights[i][j][k] = 0.01 * (i + j + k + 1);
+                    prev_deltas[i][j][k] = 0.0;
+                }
             }
-            bias_output[i] = dis(gen);
         }
     }
 
     vector<double> forward(const vector<double>& input) {
-        hidden_layer_output.resize(hidden_size);
-        output_layer_output.resize(output_size);
-
-        // input -> hidden
-        for (int i = 0; i < hidden_size; ++i) {
-            double sum = bias_hidden[i];
-            for (int j = 0; j < input_size; ++j) {
-                sum += w_input_hidden[i][j] * input[j];
+        neurons[0] = input;
+        for (size_t i = 1; i < layers.size(); ++i) {
+            for (int j = 0; j < layers[i]; ++j) {
+                double sum = weights[i - 1][j][layers[i - 1]]; // bias
+                for (int k = 0; k < layers[i - 1]; ++k) {
+                    sum += weights[i - 1][j][k] * neurons[i - 1][k];
+                }
+                neurons[i][j] = sigmoid(sum);
             }
-            hidden_layer_output[i] = sigmoid(sum);
         }
-
-        // hidden -> output
-        for (int i = 0; i < output_size; ++i) {
-            double sum = bias_output[i];
-            for (int j = 0; j < hidden_size; ++j) {
-                sum += w_hidden_output[i][j] * hidden_layer_output[j];
-            }
-            output_layer_output[i] = sigmoid(sum);
-        }
-
-        return output_layer_output;
+        return neurons.back();
     }
 
-    void train(const vector<double>& input, const vector<double>& target) {
-        forward(input);
-
-        // คำนวณ error output layer
-        vector<double> output_errors(output_size);
-        for (int i = 0; i < output_size; ++i) {
-            output_errors[i] = (target[i] - output_layer_output[i]) * sigmoid_derivative(output_layer_output[i]);
-        }
-
-        // คำนวณ error hidden layer
-        vector<double> hidden_errors(hidden_size, 0.0);
-        for (int i = 0; i < hidden_size; ++i) {
-            double error = 0.0;
-            for (int j = 0; j < output_size; ++j) {
-                error += output_errors[j] * w_hidden_output[j][i];
-            }
-            hidden_errors[i] = error * sigmoid_derivative(hidden_layer_output[i]);
-        }
-
-        // ปรับ weight hidden -> output
-        for (int i = 0; i < output_size; ++i) {
-            for (int j = 0; j < hidden_size; ++j) {
-                double delta = learning_rate * output_errors[i] * hidden_layer_output[j] + momentum * delta_w_hidden_output[i][j];
-                w_hidden_output[i][j] += delta;
-                delta_w_hidden_output[i][j] = delta;
-            }
-            double delta_b = learning_rate * output_errors[i] + momentum * delta_bias_output[i];
-            bias_output[i] += delta_b;
-            delta_bias_output[i] = delta_b;
-        }
-
-        // ปรับ weight input -> hidden
-        for (int i = 0; i < hidden_size; ++i) {
-            for (int j = 0; j < input_size; ++j) {
-                double delta = learning_rate * hidden_errors[i] * input[j] + momentum * delta_w_input_hidden[i][j];
-                w_input_hidden[i][j] += delta;
-                delta_w_input_hidden[i][j] = delta;
-            }
-            double delta_b = learning_rate * hidden_errors[i] + momentum * delta_bias_hidden[i];
-            bias_hidden[i] += delta_b;
-            delta_bias_hidden[i] = delta_b;
-        }
-    }
-
-    double calc_mse(const vector<vector<double>>& inputs, const vector<vector<double>>& targets) {
+    double backward(const vector<double>& target) {
         double mse = 0.0;
-        int n = inputs.size();
-        for (int i = 0; i < n; ++i) {
-            vector<double> out = forward(inputs[i]);
-            for (int j = 0; j < output_size; ++j) {
-                double e = targets[i][j] - out[j];
-                mse += e * e;
+        size_t last = layers.size() - 1;
+        for (int i = 0; i < layers[last]; ++i) {
+            double error = target[i] - neurons[last][i];
+            deltas[last][i] = error * sigmoid_derivative(neurons[last][i]);
+            mse += error * error;
+        }
+
+        for (int i = layers.size() - 2; i > 0; --i) {
+            for (int j = 0; j < layers[i]; ++j) {
+                double sum = 0.0;
+                for (int k = 0; k < layers[i + 1]; ++k) {
+                    sum += weights[i][k][j] * deltas[i + 1][k];
+                }
+                deltas[i][j] = sum * sigmoid_derivative(neurons[i][j]);
             }
         }
-        return mse / n;
+
+        for (size_t i = 0; i < weights.size(); ++i) {
+            for (int j = 0; j < layers[i + 1]; ++j) {
+                for (int k = 0; k < layers[i]; ++k) {
+                    double delta = LEARNING_RATE * deltas[i + 1][j] * neurons[i][k] + MOMENTUM * prev_deltas[i][j][k];
+                    weights[i][j][k] += delta;
+                    prev_deltas[i][j][k] = delta;
+                }
+                double delta = LEARNING_RATE * deltas[i + 1][j] * 1.0 + MOMENTUM * prev_deltas[i][j][layers[i]];
+                weights[i][j][layers[i]] += delta;
+                prev_deltas[i][j][layers[i]] = delta;
+            }
+        }
+
+        return mse / layers[last];
+    }
+
+    void train(const vector<Sample>& data) {
+        for (int epoch = 0; epoch < EPOCHS; ++epoch) {
+            double total_mse = 0.0;
+            for (auto& sample : data) {
+                forward(sample.input);
+                total_mse += backward(sample.target);
+            }
+            if (total_mse / data.size() < 0.001) break;
+        }
+    }
+
+    int predict(const vector<double>& input) {
+        double output = forward(input)[0];
+        return output >= 0.5 ? 1 : 0;
     }
 };
 
-int main() {
-    vector<vector<double>> inputs;
-    vector<vector<double>> outputs;
+vector<Sample> load_csv(const string& filename) {
+    vector<Sample> dataset;
+    ifstream file(filename);
+    string line;
+    while (getline(file, line)) {
+        if (line.empty() || line[0] == 'p') continue; // skip header or empty
+        stringstream ss(line);
+        Sample s;
+        double a, b;
+        ss >> a;
+        if (ss.peek() == ',') ss.ignore();
+        ss >> b;
+        s.input = {a, b};
+        if (!getline(file, line)) break;
+        stringstream st(line);
+        int t1;
+        st >> t1;
+        s.target = {double(t1)};
+        dataset.push_back(s);
+    }
+    return dataset;
+}
 
-    load_dataset("cross.csv", inputs, outputs);
+void cross_validate_trials(vector<Sample>& dataset) {
+    double best_acc = -1.0;
+    vector<int> best_hidden;
+    double best_lr = 0.0, best_mmt = 0.0;
 
-    int hidden_nodes = 5;       // ปรับได้
-    double learning_rate = 0.01;  // ปรับได้
-    double momentum = 0.5;        // ปรับได้
-    int epochs = 1000;
+    for (auto& hidden_config : hidden_layer_options) {
+        for (auto& lr : learning_rates) {
+            for (auto& mmt : momentum_values) {
+                int fold_size = dataset.size() / K_FOLD;
+                shuffle_data(dataset);
+                int TP = 0, FP = 0, TN = 0, FN = 0;
+                for (int k = 0; k < K_FOLD; ++k) {
+                    vector<Sample> train_data, test_data;
+                    for (int i = 0; i < dataset.size(); ++i) {
+                        if (i >= k * fold_size && i < (k + 1) * fold_size)
+                            test_data.push_back(dataset[i]);
+                        else
+                            train_data.push_back(dataset[i]);
+                    }
+                    vector<int> layer_config;
+                    layer_config.push_back(INPUT_SIZE);
+                    for (int h : hidden_config) layer_config.push_back(h);
+                    layer_config.push_back(OUTPUT_SIZE);
 
-    MLP mlp(2, hidden_nodes, 2, learning_rate, momentum);
+                    MLP mlp(layer_config, lr, mmt);
+                    mlp.train(train_data);
 
-    for (int epoch = 1; epoch <= epochs; ++epoch) {
-        for (size_t i = 0; i < inputs.size(); ++i) {
-            mlp.train(inputs[i], outputs[i]);
-        }
+                    for (auto& sample : test_data) {
+                        int pred = mlp.predict(sample.input);
+                        int actual = static_cast<int>(sample.target[0]);
+                        if (pred == 1 && actual == 1) TP++;
+                        else if (pred == 1 && actual == 0) FP++;
+                        else if (pred == 0 && actual == 0) TN++;
+                        else if (pred == 0 && actual == 1) FN++;
+                    }
+                }
+                double acc = 100.0 * (TP + TN) / (TP + TN + FP + FN);
 
-        if (epoch % 100 == 0) {
-            double mse = mlp.calc_mse(inputs, outputs);
-            cout << fixed << setprecision(7);
-            cout << "[Hidden layers " << hidden_nodes << " , LR " << learning_rate << ", Momentum " << momentum << "] "
-                 << "Epoch " << epoch << " AVG MSE: " << mse << endl;
+                // แสดงผลแบบใหม่
+                cout << "[Hidden layers ";
+                for (int h : hidden_config) cout << h << " ";
+                cout << ", LR " << lr << ", Momentum " << mmt << "] Accuracy: " << acc << "%\n";
+
+                if (acc > best_acc) {
+                    best_acc = acc;
+                    best_hidden = hidden_config;
+                    best_lr = lr;
+                    best_mmt = mmt;
+                }
+            }
         }
     }
 
+    cout << "========= BEST RESULT =========\n";
+    cout << "Train with: Cross.pat => Cross.csv\n";
+    cout << "[Hidden layers ";
+    for (int h : best_hidden) cout << h << " ";
+    cout << ", LR " << best_lr << ", Momentum " << best_mmt << "] Accuracy: " << best_acc << "%\n";
+}
+
+int main() {
+    string filename = "cross.csv";
+    vector<Sample> data = load_csv(filename);
+    if (data.empty()) {
+        cerr << "Failed to load dataset.\n";
+        return 1;
+    }
+    cross_validate_trials(data);
     return 0;
 }
